@@ -88,19 +88,22 @@ window.onbeforeunload = function () {
 
 class Line{
 
-    color = 0x000;
+    color = "rgb(0 0 0 / 100%)";
     size = 12;
     constructor(startPos){
         this.mousepath = [startPos];
         this.index = 0;
 
-        this.colorbtn = document.getElementById('colorbtn');
-        this.color = this.colorbtn.value;
-        ctx.strokeStyle = this.color;
-        
         this.sizespecifer = document.getElementById('sizespecifer');
         if(sizespecifer.checkValidity()) this.size = sizespecifer.value;
         ctx.lineWidth = this.size;
+        
+        this.colorbtn = document.getElementById('colorbtn');
+        this.color ="rgb( " + this.colorbtn.value.substr(1,2)+" "+this.colorbtn.value.substr(3,2)+" "+this.colorbtn.value.substr(5,2)+" /"+this.size+"% )";
+        console.log(this.color);
+        ctx.strokeStyle =this.color;
+        
+        
        
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -124,10 +127,45 @@ class Line{
     drawline(e){
         const rect = canvas.getBoundingClientRect();
         const pos = {x: originalWidth * (e.clientX - rect.left)/width, y: originalHeight * (e.clientY - rect.top)/height};
-        console.log(e.clientY - rect.top);
+        //console.log(e.clientY - rect.top);
         this.mousepath.push(pos);
         this.draw_dydxline();
         this.index++;
+    }
+}
+
+class eraser extends line{
+    constructor(startPos){
+        this.mousepath = [startPos];
+        this.index = 0;
+
+        this.colorbtn = document.getElementById('colorbtn');
+        this.color = this.colorbtn.value;
+        console.log(this.color);
+        ctx.strokeStyle = this.color;
+        
+        this.sizespecifer = document.getElementById('sizespecifer');
+        if(sizespecifer.checkValidity()) this.size = sizespecifer.value;
+        ctx.lineWidth = this.size;
+       
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+    }
+    
+    draw_dydxline(){
+        if(this.index === 0){
+            ctx.beginPath();
+            ctx.moveTo(this.mousepath[0].x, this.mousepath[0].y);
+            return;
+        }
+
+        const prev = this.mousepath[this.index-1];
+        const curr = this.mousepath[this.index];
+
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(curr.x, curr.y);
+        ctx.stroke();
     }
 }
 

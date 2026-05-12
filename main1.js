@@ -17,6 +17,8 @@ function catchmouse(e){
     mouse.y = e.clientY - rect.top;
 }
 
+
+
 canvas.addEventListener('mousemove', e=>{
             const rect = canvas.getBoundingClientRect();
             const mouseStartPos={x:e.clientX - rect.left, y:e.clientY - rect.top};
@@ -48,7 +50,7 @@ class line{
         this.mousepath.push(mousePos);
         this.index = 0;
 
-        ctx.strokeStyle = '#0f0';
+        ctx.strokeStyle = 'rgb(0, 0, 0, 0%)';
         ctx.lineWidth = 15;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -69,10 +71,6 @@ class line{
         this.mousepath.push(pos);
         this.draw_dxdyline();
         this.index++;
-    }
-
-    stopdraw(){
-        
     }
 }
 
