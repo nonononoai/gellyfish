@@ -10,44 +10,52 @@ const timer = document.getElementById("timer");
 const timeBar = document.getElementById("timeBar");
 const btnEraser = document.getElementById("eraserbtn");
 
-let lines = [];
+const state = {
+    mode: 0,
+    scaler:1,
+    width: 1900,
+    height: 1080,
+    lines: [],
+    currentLine: null,
+};
+
 let canvases = [];
-let currentLine = null;
 let toolsWidth = tools.style.width;
-let width = originalWidth = 1900;
-let height = originalHeight = 1080;  
+let originalWidth = state.width;
+let originalHeight = state.height;  
 let magnificationRatio = 100;
-let scaler = 1;
 let time = 0;
-let mode = 0;
 
-canvas.width = width;
-canvas.height = height;
-canvas.style.width = width+"px";
-canvas.style.height = height+"px";
+function initCanvas(can){
+    can.width = width;
+    can.height = height;
+    can.style.width = width+"px";
+    can.style.height = height+"px";
+}
+
+initCanvas(canvas);
 
 
 
-
-let leftVal = (canvascontainer.offsetWidth/2) - width/2;
-let topVal = (canvascontainer.offsetHeight/2)-height/2;
+let leftVal = (canvascontainer.offsetWidth/2) - state.width/2;
+let topVal = (canvascontainer.offsetHeight/2)- state.height/2;
 canvas.style.position = "absolute";
 canvas.style.zIndex = `-10`;
-canvas.style.left = (canvascontainer.offsetWidth/2 - width/2) + "px";
-canvas.style.top =  (canvascontainer.offsetHeight/2 - height/2) + "px";
+canvas.style.left = (canvascontainer.offsetWidth/2 - state.width/2) + "px";
+canvas.style.top =  (canvascontainer.offsetHeight/2 - state.height/2) + "px";
 
 btnEraser.addEventListener('mousedown', e=>{
-    if(mode == 0){
-        mode = 1;
+    if(state.mode == 0){
+        state.mode = 1;
     }else{
-        mode = 0;
+        state.mode = 0;
     }
 });
 
 btnZoomIn.addEventListener('mousedown', e=>{
-    scaler += 0.1;
-    width = originalWidth * scaler;
-    height = originalHeight * scaler;
+    state.scaler += 0.1;
+    state.width = originalWidth * state.scaler;
+    state.height = originalHeight * state.scaler;
     canvas.style.width = width+"px" ;
     canvas.style.height = height + "px";
 
@@ -56,11 +64,11 @@ btnZoomIn.addEventListener('mousedown', e=>{
 });
 
 btnZoomOut.addEventListener('mousedown', e =>{
-    scaler -= 0.1;
-    width = originalWidth * scaler;
-    height = originalHeight * scaler;
-    canvas.style.width = width+"px" ;
-    canvas.style.height = height + "px";
+    state.scaler -= 0.1;
+    state.width = originalWidth * state.scaler;
+    state.height = originalHeight * state.scaler;
+    canvas.style.width = state.width+"px" ;
+    canvas.style.height = state.height + "px";
 
     canvas.style.left = (canvascontainer.offsetWidth/2 - width/2) + "px";
     canvas.style.top =  (canvascontainer.offsetHeight/2 - height/2) + "px";
@@ -74,31 +82,38 @@ timeBar.addEventListener('change', e=>{
 
 
 html.addEventListener('mousedown', e=>{
-    const rect = canvas.getBoundingClientRect();
-    const startPos = {x: originalWidth * (e.clientX - rect.left)/width, y: originalHeight * (e.clientY - rect.top)/height};
+    const startPos = toCanvasCoord(e);
 
-    if(mode == 0){
-        currentLine = new Line(startPos);
-        lines.push(currentLine);
-        currentLine._moveHandler = currentLine.drawline.bind(currentLine);
-        canvas.addEventListener('mousemove', currentLine._moveHandler);
+    if(state.mode == 0){
+        state.currentLine = new Line(startPos);
+        state.lines.push(state.currentLine);
+        state.currentLine._moveHandler = state.currentLine.drawline.bind(state.currentLine);
+        canvas.addEventListener('mousemove', state.currentLine._moveHandler);
     }else{
-        currentLine = new eraser(startPos);
-        lines.push(currentLine);
-        currentLine._moveHandler = currentLine.drawline.bind(currentLine);
-        canvas.addEventListener('mousemove', currentLine._moveHandler);
+        state.currentLine = new eraser(startPos);
+        state.lines.push(state.currentLine);
+        state.currentLine._moveHandler = state.currentLine.drawline.bind(state.currentLine);
+        canvas.addEventListener('mousemove', state.currentLine._moveHandler);
     }
 });
 
 html.addEventListener('mouseup', e=>{
-    if (!currentLine) return;
-    canvas.removeEventListener('mousemove', currentLine._moveHandler);
-    currentLine = null;
+    if (!state.currentLine) return;
+    canvas.removeEventListener('mousemove', state.currentLine._moveHandler);
+    state.currentLine = null;
 });
 
 window.onbeforeunload = function () {
   return "";
 };
+
+function toCanvasCoord(e){
+    const rect = canvas.getBoundingClientRect();
+    return{
+        x: originalWidth * (e.clientX - rect.left) / rect.width,
+        y: originalHeight * (e.clientY - rect.top) / rect.height
+    };
+}
 
 indexe = 1;
 class Line{
@@ -143,8 +158,7 @@ class Line{
     }
 
     drawline(e){
-        const rect = canvas.getBoundingClientRect();
-        const pos = {x: originalWidth * (e.clientX - rect.left)/width, y: originalHeight * (e.clientY - rect.top)/height};
+        const pos = toCanvasCoord(e);
         //console.log(e.clientY - rect.top);
         this.mousepath.push(pos);
         this.draw_dydxline();
@@ -189,7 +203,7 @@ class eraser{
 
     drawline(e){
         const rect = canvas.getBoundingClientRect();
-        const pos = {x: originalWidth * (e.clientX - rect.left)/width, y: originalHeight * (e.clientY - rect.top)/height};
+        const pos = {x: originalWidth * (e.clientX - rect.left)/state.width, y: originalHeight * (e.clientY - rect.top)/state.height};
         this.mousepath.push(pos);
         this.draw_dydxline();
         this.index++;
