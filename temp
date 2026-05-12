@@ -1,0 +1,47 @@
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let snake = [{x:600, y:400}];
+let angle =0;
+let speed =3;
+let foods =[];
+
+let mouse ={x:600, y:400};
+canvas.addEventListener('mousemove', e=>{
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+    console.log("cx:"+e.clientX );
+    console.log("rc:"+rect.left);
+});
+
+function gameLoop(){
+    ctx.fillStyle =  '#111';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const head = snake[0];
+    const dx = mouse.x - head.x;
+    const dy = mouse.y -head.y;
+    angle = Math.atan2(dy, dx);
+
+    const newHead ={
+        x: head.x + Math.cos(angle) * speed,
+        y: head.y + Math.sin(angle) * speed
+    };
+    snake.unshift(newHead);
+
+    ctx.strokeStyle = '#0f0';
+    ctx.lineWidth = 15;
+    ctx.lineJoin ='round';
+    ctx.lineCap ='round';
+    ctx.beginPath();
+    snake.forEach((p, i) =>{
+        if(i===0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+    });
+    ctx.stroke();
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();

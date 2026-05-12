@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>sli</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="tools">
+                <div class="items"><input type="color" id="colorbtn"></div>
+                <div class="items"><input type="text" value="12" pattern="[1-9][0-9]*" id="sizespecifer" placeholder="px" id="pxsizebtn"></div>
+                <div class="items maltibox"><input type="button" value="+"> <input type="button" value="-"></div>
+            </div>
+            <div class="canvas">
+                <canvas id="game" width="1200" height="800"></canvas>
+            </div>
+        </div>
+        <div class="aniTools">
+            <div class="timebar">
+                <input type="range" id="timebar" name="time" min="0" max="120">
+            </div>
+        </div>
+
+        <script src="src/main.js"></script>
+    </body>
+</html>
