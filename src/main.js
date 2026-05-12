@@ -124,7 +124,7 @@ class Line{
        
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
-        ctx.globalCompositeOperation = "destination-out";
+        ctx.globalCompositeOperation = "source-over";
     }
     draw_dydxline(){
         if(this.index === 0){
@@ -158,7 +158,7 @@ class eraser{
         this.index = 0;
 
         
-        ctx.strokeStyle = "rgb(0 0 0 / 0%)";
+        ctx.strokeStyle = "rgb(0 0 0 / 100%)";
         
         this.sizespecifer = document.getElementById('sizespecifer');
         if(sizespecifer.checkValidity()) this.size = sizespecifer.value;
